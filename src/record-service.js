@@ -22,14 +22,13 @@ function cloneProperties (obj) {
   }
   return temp;
 }
-var RecordService = function (config) {
-  if (!config.provider) { throw new Error('Provider required'); }
-  if (!config.type) { throw new Error('Type required'); }
-  if (!config.data && !config.id) { throw new Error('Data or ID required'); }
-  var _provider = config.provider;
-  var _type = toSnakeCase(config.type);
-  var _data = config.data;
-  var _id = config.id;
+var RecordService = function (provider, type, id) {
+  if (!provider) { throw new Error('Provider required'); }
+  if (!type) { throw new Error('Type required'); }
+  var _provider = provider;
+  var _type = toSnakeCase(type);
+  var _id = id;
+  var _data = {};
   this.getType = function () { return _type; }
   this.save = function () {
     if (!_id) { _data.createdAt = new Date(); }

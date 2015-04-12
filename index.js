@@ -4,16 +4,9 @@ var StorageProviderFirebase = require('./src/storage-provider-firebase.js');
 
 var storageProviderFirebase = new StorageProviderFirebase('https://castle-scott.firebaseio.com/');
 var bday = new Date('May 28, 1990');
-var scott = new RecordService({
-  provider: storageProviderFirebase,
-  type: 'Person',
-  data: { name: 'Scott', title: 'CTO', kid: {name: 'Scott Jr', birthday: bday } }
-});
+var scott = new RecordService(storageProviderFirebase, 'Person');
 
-scott.save()
+scott.update({ name: 'Scott', title: 'CTO', kid: {name: 'Scott Jr', birthday: bday } })
 .then(function () {
   console.log('Saved!');
-  setTimeout(function () {
-    scott.update({role: 'Dragon'});
-  }, 5000);
 });
