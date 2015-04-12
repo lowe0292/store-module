@@ -38,6 +38,12 @@ var RecordService = function (config) {
     .then(function (id) {
       _id = id;
     });
+  },
+  this.update = function (data) {
+    var createdAt = _data.createdAt;
+    _data = data;
+    _data.createdAt = createdAt;
+    return this.save();
   }
 };
 

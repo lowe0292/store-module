@@ -13,4 +13,7 @@ var scott = new RecordService({
 scott.save()
 .then(function () {
   console.log('Saved!');
+  setTimeout(function () {
+    scott.update({role: 'Dragon'});
+  }, 5000);
 });
