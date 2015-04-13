@@ -8,6 +8,7 @@ var scott = new RecordService(storageProviderFirebase, 'Person');
 var dusty = new RecordService(storageProviderFirebase, 'Car');
 var fluffy = new RecordService(storageProviderFirebase, 'Cat');
 var damien = new RecordService(storageProviderFirebase, 'Cat');
+var river = new RecordService(storageProviderFirebase, 'Cat');
 var clone;
 
 scott.update({ name: 'Scott', title: 'CTO', kid: {name: 'Scott Jr', birthday: bday } })
@@ -15,16 +16,19 @@ scott.update({ name: 'Scott', title: 'CTO', kid: {name: 'Scott Jr', birthday: bd
   return dusty.update({make: 'Chevy', model: 'Monte Carlo'});
 })
 .then(function () {
-  return fluffy.update({color: 'grey', age: 3});
+  return fluffy.update({name: 'Fluffy', color: 'grey', age: 3});
 })
 .then(function () {
-  return damien.update({color: 'black', model: 3});
+  return damien.update({name: 'Damien', color: 'black', model: 3});
+})
+.then(function () {
+  return river.update({name: 'River', color: 'grey', model: 3});
 })
 .then(function () {
   clone = new RecordService(storageProviderFirebase, 'Person', scott.getID());
   clone.hasOne('Car');
   clone.hasMany('Cat');
-  return clone.sync(function (data) {});
+  return clone.load();
 })
 .then(function (data) {
   return clone.hasCar(dusty);
@@ -37,11 +41,15 @@ scott.update({ name: 'Scott', title: 'CTO', kid: {name: 'Scott Jr', birthday: bd
 })
 .then(function () {
   var car = clone.getCar();
-  return car.load()
+  return car.load();
 })
-.then(function (carData) {
-  return clone.getCats().load();
+.then(function () {
+  return clone.getCats().sync(function (data) {
+    console.log('cats updated', data);
+  });
 })
 .then(function (data) {
-  console.log(data);
+  setTimeout(function () {
+    clone.hasCat(river);
+  }, 10000);
 })

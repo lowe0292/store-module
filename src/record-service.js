@@ -60,10 +60,14 @@ var RecordService = function (provider, type, id) {
       onDataChanged(data);
     });
   };
+  this.unsync = function () {
+    return _provider.unsync(pluralize(toCamelCase(_type)), _id);
+  }
   this.hasOne = function (type) {
     var service = this;
     this['get' + toSnakeCase(type)] = function () {
-      var record = new RecordService(_provider, type, _data[toCamelCase(type) + '_id']);
+      var id = _data[toCamelCase(type) + '_id'];
+      var record = new RecordService(_provider, type, id);
       return record;
     }
     this['has' + toSnakeCase(type)] = function (record) {
@@ -73,15 +77,16 @@ var RecordService = function (provider, type, id) {
     }
   };
   this.hasMany = function (type) {
-    var service = this;
+    var _service = this;
+    var _collection = new CollectionService(_provider, type);
     this['get' + pluralize(toSnakeCase(type))] = function () {
+      _collection = new CollectionService(_provider, type);
       var ids = _data[toCamelCase(type) + '_ids'];
-      var collection = new CollectionService(_provider, type);
       for (var i = 0; i < ids.length; i++) {
         var record = new RecordService(_provider, type, ids[i]);
-        collection.addRecord(record);
+        _collection.addRecord(record);
       }
-      return collection;
+      return _collection;
     }
     this['has' + toSnakeCase(type)] = function (record) {
       var id = record.getID();
@@ -90,7 +95,9 @@ var RecordService = function (provider, type, id) {
         _data[toCamelCase(record.getType()) + '_ids'] = [];
       }
       _data[toCamelCase(record.getType()) + '_ids'].push(id);
-      return service.save();
+      var record = new RecordService(_provider, type, id);
+      _collection.addRecord(record);
+      return _service.save();
     }
   };
 };

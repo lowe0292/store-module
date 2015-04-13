@@ -112,6 +112,9 @@ var StorageProviderFirebase = function (url) {
       })
     });
     return this.load(collection, id);
+  };
+  this.unsync = function (collection, id) {
+    _ref.child(collection).child(id).off();
   }
 };
 

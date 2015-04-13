@@ -12,8 +12,17 @@ var CollectionService = function (provider, type) {
   if (!type) { throw new Error('Type required'); }
   var _type = toSnakeCase(type);
   var _records = [];
+  var _sync;
   this.addRecord = function (record) {
+    var collection = this;
     if (record.getType() !== _type) { throw new Error('Type mismatch'); }
+    if (_sync) {
+      console.log('sync is on!');
+      record.sync(function () {
+        collection.load()
+        .then(_sync);
+      });
+    }
     _records.push(record);
   }
   this.load = function () {
@@ -29,6 +38,23 @@ var CollectionService = function (provider, type) {
     .then(function () {
       return collectionData;
     });
+  }
+  this.sync = function (onDataChanged) {
+    _sync = onDataChanged;
+    var collection = this;
+    for (var i = 0; i < _records.length; i++) {
+      _records[i].sync(function () {
+        collection.load()
+        .then(onDataChanged);
+      });
+    }
+    return collection.load();
+  }
+  this.unsync = function () {
+    for (var i = 0; i < _records.length; i++) {
+      _records[i].unsync();
+    }
+    delete this._sync;
   }
 };
 
