@@ -9,4 +9,9 @@ var scott = new RecordService(storageProviderFirebase, 'Person');
 scott.update({ name: 'Scott', title: 'CTO', kid: {name: 'Scott Jr', birthday: bday } })
 .then(function () {
   console.log('Saved!');
-});
+  var clone = new RecordService(storageProviderFirebase, 'Person', scott.getID());
+  return clone.load();
+})
+.then(function (data) {
+  console.log(data);
+})

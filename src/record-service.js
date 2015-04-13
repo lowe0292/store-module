@@ -30,20 +30,28 @@ var RecordService = function (provider, type, id) {
   var _id = id;
   var _data = {};
   this.getType = function () { return _type; }
+  this.getID = function () { return _id; }
   this.save = function () {
     if (!_id) { _data.createdAt = new Date(); }
     _data.lastUpdatedAt = new Date();
-    return _provider.save(pluralize(toCamelCase(_type)), cloneProperties(_data), _id)
+    return _provider.save(pluralize(toCamelCase(_type)), _id, cloneProperties(_data))
     .then(function (id) {
       _id = id;
     });
-  },
+  };
   this.update = function (data) {
     var createdAt = _data.createdAt;
     _data = data;
     _data.createdAt = createdAt;
     return this.save();
-  }
+  };
+  this.load = function () {
+    if (!_id) { throw new Error('Cannot load a record without an id'); }
+    return _provider.load(pluralize(toCamelCase(_type)), _id)
+    .then(function (data) {
+     return _data = data;
+    });
+  };
 };
 
 module.exports = RecordService;
