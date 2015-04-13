@@ -17,7 +17,6 @@ var CollectionService = function (provider, type) {
     var collection = this;
     if (record.getType() !== _type) { throw new Error('Type mismatch'); }
     if (_sync) {
-      console.log('sync is on!');
       record.sync(function () {
         collection.load()
         .then(_sync);
@@ -56,6 +55,8 @@ var CollectionService = function (provider, type) {
     }
     delete this._sync;
   }
+  //TODO: Add query(sortBy, equalTo) that returns a subset records in this collection
+  //TODO: Add all() that returns all records in this collection
 };
 
 module.exports = CollectionService;

@@ -3,12 +3,19 @@ var CollectionService = require('./src/collection-service.js');
 var StorageProviderFirebase = require('./src/storage-provider-firebase.js');
 
 var storageProviderFirebase = new StorageProviderFirebase('https://castle-scott.firebaseio.com/');
+var PersonService = function () { };
+PersonService.prototype = new RecordService(storageProviderFirebase, 'Person');
+var CarService = function () { };
+CarService.prototype = new RecordService(storageProviderFirebase, 'Car');
+var CatService = function () { };
+CatService.prototype = new RecordService(storageProviderFirebase, 'Cat');
+
 var bday = new Date('May 28, 1990');
-var scott = new RecordService(storageProviderFirebase, 'Person');
-var dusty = new RecordService(storageProviderFirebase, 'Car');
-var fluffy = new RecordService(storageProviderFirebase, 'Cat');
-var damien = new RecordService(storageProviderFirebase, 'Cat');
-var river = new RecordService(storageProviderFirebase, 'Cat');
+var scott = new PersonService();
+var dusty = new CarService();
+var fluffy = new CatService();
+var damien = new CatService();
+var river = new CatService();
 var clone;
 
 scott.update({ name: 'Scott', title: 'CTO', kid: {name: 'Scott Jr', birthday: bday } })
