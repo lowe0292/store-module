@@ -1,3 +1,4 @@
+var pluralize = require('pluralize');
 var q = require('q');
 function toSnakeCase (string) {
   var words = string.split(' ');
@@ -7,9 +8,15 @@ function toSnakeCase (string) {
   }
   return output;
 }
+function toCamelCase (string) {
+  var snakeCase = toSnakeCase(string);
+  return snakeCase.charAt(0).toLowerCase() + snakeCase.slice(1);
+}
 var CollectionService = function (provider, type) {
   if (!provider) { throw new Error('Provider required'); }
   if (!type) { throw new Error('Type required'); }
+  var RecordService = require('./record-service.js'); //required at runtime to avoid circular dependency
+  var _provider = provider;
   var _type = toSnakeCase(type);
   var _records = [];
   var _sync;
@@ -55,8 +62,16 @@ var CollectionService = function (provider, type) {
     }
     delete this._sync;
   }
-  //TODO: Add query(sortBy, equalTo) that returns a subset records in this collection
-  //TODO: Add all() that returns all records in this collection
+  this.query = function (sortBy, equalTo, limit) {
+    var service = this;
+    service._records = [];
+    function resultFound (key) {
+      var record = new RecordService(_provider, _type, key);
+      service.addRecord(record);
+    }
+    var type = pluralize(toCamelCase(_type));
+    _provider.query(type, sortBy, equalTo, limit, resultFound);
+  }
 };
 
 module.exports = CollectionService;

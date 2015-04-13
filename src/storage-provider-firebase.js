@@ -115,6 +115,17 @@ var StorageProviderFirebase = function (url) {
   };
   this.unsync = function (collection, id) {
     _ref.child(collection).child(id).off();
+  };
+  this.query = function (collection, sortBy, equalTo, limit, callback) {
+    var query = _ref.child(collection);
+    if (sortBy) {
+      query = query.orderByChild(sortBy);
+      if (equalTo) { query = query.equalTo(equalTo); }
+    }
+    if (limit) { query = query.limitToFirst(limit); }
+    query.on("child_added", function(snapshot) {
+      callback(snapshot.key());
+    });
   }
 };
 
