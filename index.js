@@ -10,8 +10,8 @@ scott.update({ name: 'Scott', title: 'CTO', kid: {name: 'Scott Jr', birthday: bd
 .then(function () {
   console.log('Saved!');
   var clone = new RecordService(storageProviderFirebase, 'Person', scott.getID());
-  return clone.load();
+  return clone.sync(function (data) { console.log(data); });
 })
 .then(function (data) {
-  console.log(data);
+  console.log('done syncing', data);
 })

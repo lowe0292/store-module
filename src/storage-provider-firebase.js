@@ -64,12 +64,16 @@ var StorageProviderFirebase = function (url) {
       }
       deferred.resolve(data);
     }
-    // recurse through the properties
-    _ref.child(".info/serverTimeOffset").on('value', function(ss) {
-      var offset = ss.val() || 0;
-      translateTimesRecursive(data._times, [], offset);
-      delete data._times;
-    });
+    if (data && data._times) {
+      // recurse through the properties
+      _ref.child(".info/serverTimeOffset").on('value', function(ss) {
+        var offset = ss.val() || 0;
+        translateTimesRecursive(data._times, [], offset);
+        delete data._times;
+      });
+    } else {
+      deferred.resolve(data);
+    }
     return deferred.promise;
   };
   this.save = function (collection, id, data) {
@@ -100,6 +104,15 @@ var StorageProviderFirebase = function (url) {
     });
     return deferred.promise;
   };
+  this.sync = function (collection, id, callback) {
+    _ref.child(collection).child(id).on('value', function (snapshot) {
+      convertServerTimesToClientDates(snapshot.val())
+      .then(function (convertedData) {
+        callback(convertedData);
+      })
+    });
+    return this.load(collection, id);
+  }
 };
 
 module.exports = StorageProviderFirebase;

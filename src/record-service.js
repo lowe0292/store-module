@@ -52,6 +52,13 @@ var RecordService = function (provider, type, id) {
      return _data = data;
     });
   };
+  this.sync = function (onDataChanged) {
+    if (!_id) { throw new Error('Cannot sync a record without an id'); }
+    return _provider.sync(pluralize(toCamelCase(_type)), _id, function (data) {
+      _data = data;
+      onDataChanged(data);
+    });
+  }
 };
 
 module.exports = RecordService;
