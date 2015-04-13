@@ -19,6 +19,7 @@ function Cat () {
   return new F();
 }
 
+// Instantiate your business objects
 var bday = new Date('May 28, 1990');
 var scott = Person();
 var dusty = Car();
@@ -27,6 +28,7 @@ var damien = Cat();
 var river = Cat();
 var clone;
 
+// store data
 scott.update({ name: 'Scott', title: 'CTO', kid: {name: 'Scott Jr', birthday: bday } })
 .then(function () {
   return dusty.update({make: 'Chevy', model: 'Monte Carlo'});
@@ -41,6 +43,7 @@ scott.update({ name: 'Scott', title: 'CTO', kid: {name: 'Scott Jr', birthday: bd
   return river.update({name: 'River', color: 'grey', model: 3});
 })
 .then(function () {
+  // load some data
   clone = new RecordService(storageProviderFirebase, 'Person', scott.getID());
   clone.hasOne('Car');
   clone.hasMany('Cat');
@@ -61,6 +64,6 @@ scott.update({ name: 'Scott', title: 'CTO', kid: {name: 'Scott Jr', birthday: bd
 })
 .then(function (data) {
   var collection = new CollectionService(storageProviderFirebase, 'Cat');
-  collection.query('color', 'grey');
-  collection.sync(function (data) { console.log('number of grey cats:', data.length); });
+  collection.query('color', 'grey', 1);
+  collection.sync(function (data) { console.log('grey cats:', data); });
 })
