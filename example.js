@@ -64,6 +64,6 @@ scott.update({ name: 'Scott', title: 'CTO', kid: {name: 'Scott Jr', birthday: bd
 })
 .then(function (data) {
   var collection = new CollectionService(storageProviderFirebase, 'Cat');
-  collection.query('color', 'grey', 1);
+  collection.query('color', 'grey');
   collection.sync(function (data) { console.log('grey cats:', data); });
 })
