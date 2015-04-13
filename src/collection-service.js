@@ -1,4 +1,35 @@
-var CollectionService = function () {
+var q = require('q');
+function toSnakeCase (string) {
+  var words = string.split(' ');
+  var output = '';
+  for (var i = 0; i < words.length; i++) {
+    output = output + words[i].charAt(0).toUpperCase() + words[i].slice(1);
+  }
+  return output;
+}
+var CollectionService = function (provider, type) {
+  if (!provider) { throw new Error('Provider required'); }
+  if (!type) { throw new Error('Type required'); }
+  var _type = toSnakeCase(type);
+  var _records = [];
+  this.addRecord = function (record) {
+    if (record.getType() !== _type) { throw new Error('Type mismatch'); }
+    _records.push(record);
+  }
+  this.load = function () {
+    if (!_records || !_records.length) { throw new Error('Cannot load a collection without records'); }
+    var promises = [];
+    var collectionData = [];
+    for (var i = 0; i < _records.length; i++) {
+      promises.push(_records[i].load().then(function (recordData) {
+        collectionData.push(recordData);
+      }));
+    }
+    return q.all(promises)
+    .then(function () {
+      return collectionData;
+    });
+  }
 };
 
 module.exports = CollectionService;

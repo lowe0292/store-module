@@ -1,4 +1,5 @@
 var pluralize = require('pluralize');
+var CollectionService = require('./collection-service.js');
 function isDate (object) {
   return Object.prototype.toString.call(object) === '[object Date]'
 }
@@ -58,7 +59,40 @@ var RecordService = function (provider, type, id) {
       _data = data;
       onDataChanged(data);
     });
-  }
+  };
+  this.hasOne = function (type) {
+    var service = this;
+    this['get' + toSnakeCase(type)] = function () {
+      var record = new RecordService(_provider, type, _data[toCamelCase(type) + '_id']);
+      return record;
+    }
+    this['has' + toSnakeCase(type)] = function (record) {
+      var id = record.getID();
+      _data[toCamelCase(record.getType()) + '_id'] = id;
+      return service.save();
+    }
+  };
+  this.hasMany = function (type) {
+    var service = this;
+    this['get' + pluralize(toSnakeCase(type))] = function () {
+      var ids = _data[toCamelCase(type) + '_ids'];
+      var collection = new CollectionService(_provider, type);
+      for (var i = 0; i < ids.length; i++) {
+        var record = new RecordService(_provider, type, ids[i]);
+        collection.addRecord(record);
+      }
+      return collection;
+    }
+    this['has' + toSnakeCase(type)] = function (record) {
+      var id = record.getID();
+      var ids = _data[toCamelCase(record.getType()) + '_ids'];
+      if(!ids || !ids.length) {
+        _data[toCamelCase(record.getType()) + '_ids'] = [];
+      }
+      _data[toCamelCase(record.getType()) + '_ids'].push(id);
+      return service.save();
+    }
+  };
 };
 
 module.exports = RecordService;
